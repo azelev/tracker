@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: tasktracker_db2
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    networks:
+      - tasktracker-network
+  #    volumes:
+  #      - mysql-data:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tracker-app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/tasktracker_db2
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    networks:
+      - tasktracker-network
+
+volumes:
+  mysql-data:
+
+networks:
+  tasktracker-network:
+    driver: bridge
